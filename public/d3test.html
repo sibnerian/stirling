@@ -35,9 +35,6 @@ line.link {
     <script type="text/javascript" src="stirling.js"></script>
     <script type="text/javascript">
 
-        function createVis(divID, divWidth, divHeight){
-
-        }
 
 var w = 1280,
     h = 800,
@@ -62,7 +59,7 @@ d3.json("flare.json", function(json){
   root = stirlingJSON(6, 3);
   root.fixed = true;
   root.x = w / 2;
-  root.y = h / 2 - 80; 
+  root.y = h / 2 ;
   update();
 
 });
@@ -98,14 +95,14 @@ function update() {
       .style("fill", color);
 
   node.transition()
-      .attr("r", calcRadius);
+      .attr("r", radius);
 
   // Enter any new nodes.
   node.enter().append("svg:circle")
       .attr("class", "node")
       .attr("cx", function(d) { return d.x; })
       .attr("cy", function(d) { return d.y; })
-      .attr("r", calcRadius)
+      .attr("r", radius)
       .style("fill", color)
       .on("click", click)
       .call(force.drag);
@@ -124,8 +121,8 @@ function tick() {
       .attr("x2", function(d) { return d.target.x; })
       .attr("y2", function(d) { return d.target.y; });
 
-  node.attr("cx", function(d) { return d.x = Math.max(calcRadius(d), Math.min(w - calcRadius(d), d.x)); })
-      .attr("cy", function(d) { return d.y = Math.max(calcRadius(d), Math.min(h - calcRadius(d), d.y)); });
+  node.attr("cx", function(d) { return d.x = Math.max(radius(d), Math.min(w - radius(d), d.x)); })
+      .attr("cy", function(d) { return d.y = Math.max(radius(d), Math.min(h - radius(d), d.y)); });
 }
 
 // Color leaf nodes orange, and packages white or blue.
@@ -133,7 +130,7 @@ function color(d) {
   return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
 }
 
-function calcRadius(d){
+function radius(d){
   return d.children ? Math.sqrt(d.size*1000) / 10 : Math.sqrt(d.size*1000) / 10;
 
 }
