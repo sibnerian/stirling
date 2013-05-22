@@ -17,7 +17,7 @@ function stirlingJSON(n, k){
 	var result = {}
 	if(invalidPartition(n,k)) return result
 	var stir = stirling(n,k)
-	result.txt = stir + ' ' + k +'-part partitions of a ' + n + '-set'
+	result.txt = 'S(' + n + ',' + k + ')=' + stir + ' (' + stir + ' ' + k +'-part partitions of a ' + n + '-set) '
 	result.size = stir
 	var children = []
 	if(!(n===k) && !(k===1)){
@@ -46,7 +46,7 @@ function createStirlingVis(divID, divWidth, divHeight, n, k){
 
     var force = d3.layout.force()
         .on("tick", tick)
-        .charge(function(d){ return d.size * -120 || -200 })
+        .charge(function(d){ return d.size * -130 || -200 })
         .linkDistance(function(d) { return d.target._children ? 80 : 30; })
         .size([w, h - 160])
         .gravity(0.35);
@@ -72,6 +72,8 @@ function createStirlingVis(divID, divWidth, divHeight, n, k){
             .nodes(nodes)
             .links(links)
             .start();
+
+
 
         // Update the links…
         link = vis.selectAll("line.link")
@@ -112,6 +114,7 @@ function createStirlingVis(divID, divWidth, divHeight, n, k){
         node.append("svg:title")
             .text(function(d) {return d.txt; });
 
+
     }
 
     function tick() {
@@ -131,6 +134,7 @@ function createStirlingVis(divID, divWidth, divHeight, n, k){
 
     function radius(d){
         //return d.children ? Math.sqrt(d.size*1000) / 10 : Math.sqrt(d.size*1000) / 10;
+        //SQRT was a little too small, but it would be good for large visualizations, so the code stays for now.
         return Math.pow(d.size * 1000, 0.55) / 10;
 
     }

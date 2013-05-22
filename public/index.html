@@ -1,149 +1,113 @@
 
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Stirling Numbers</title>
     <link type="text/css" rel="stylesheet" href="style.css"/>
-    <style type="text/css">
 
-        circle.node {
-            cursor: pointer;
-            stroke: #000;
-            stroke-width: .5px;
-        }
+      <script type="text/javascript" src="d3/d3.js"></script>
+      <script type="text/javascript" src="d3/d3.geom.js"></script>
+      <script type="text/javascript" src="d3/d3.layout.js"></script>
+      <script src="http://d3js.org/d3.v3.min.js"></script>
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+      <script type="text/javascript" src="stirling.js"></script>
+      <script type="text/javascript" src="voronoi.js"></script>
 
-        line.link {
-            fill: none;
-            stroke: #9ecae1;
-            stroke-width: 1.5px;
-        }
+  </head>
 
-    </style>
-</head>
-<body>
-<h2>
-    Flare code size<br>
-    force-directed graph
-</h2>
-<script type="text/javascript" src="d3/d3.js"></script>
-<script type="text/javascript" src="d3/d3.geom.js"></script>
-<script type="text/javascript" src="d3/d3.layout.js"></script>
-<script type="text/javascript" src="stirling.js"></script>
-<script type="text/javascript">
+  <body>
+  <div class="container">
+      <h1>Stirling Numbers of the Second Kind</h1>
+      <p>In order for a set of sets S<sub>1</sub>, S<sub>2</sub>, ... to partition a set A, two things must be true:</p>
+      <ul>
+          <li>No two sets S<sub>k</sub>, S<sub>j</sub> can share a common element.</li>
+          <li>For every element of A, there is a set S<sub>k</sub> that contains that element.</li>
+      </ul>
+      <p>For instance, if this red block is a set:</p>
+      <div id="vor_1" class="voronoi-set"></div>
+      <p>Then the following shows how it would look partitioned into 3 parts, color-coded green, yellow, and blue:</p>
+      <div id="vor_2" class="voronoi-set"></div>
+      <p>The idea of a partition is useful in many cases; for instance, we can say that two
+      probabilistic events are DISJOINT if they partition the set of all outcomes.</p>
+      <p>Given this definition, one could
+      pose the following question: how many ways are there to break a set of <i>n</i> elements (an<i> n-set</i> ) into
+      a partition of <i>k</i> non-empty sets (a <i>k-partition</i>)? You would not be the first to consider the question-
+      that honor goes to <a href="http://en.wikipedia.org/wiki/James_Stirling_(mathematician)">James Stirling</a>,
+      who first described such numbers in the 18th century.</p>
 
-    var w = 1280,
-            h = 800,
-            node,
-            link,
-            root;
+      <p>It turns out that there is a simple formula for the number of k-partitions of an n-set (abbreviated S(n,k)
+      <blockquote>S(n,k) = S(n-1, k-1) + kS(n-1, k)</blockquote>
+      Examples:</p>
+      <p>To see why this is the case, first observe that if k=1, then S(n,k)=1. After all, there is only one way
+      to partition a set into 1 part!</p>
+      <div id="vor_3" class="voronoi-set"></div>
+      <p>Following similar logic, note that if n=k, then S(n,k)=1; each partitioning set will contain
+          just one element. For the next example, n=k=4.</p>
+      <div id="vor_4" class="voronoi-set"></div>
+      <p>Now, to show the recurrence relation, we consider the first element of a set A; in this case, the one furthest left. Now this
+       element can be included in a set with other elements, or it can be on its own. If it IS on its own, then there are
+      n-1 elements remaining to be partitioned into k-1 subsets- that is, there are S(n-1, k-1) distinct possibilities for the
+      other sets that, together with the singleton set, will partition the set A. To illustrate this, take n=4, k=3. The
+      first element is highlighted in yellow.</p>
+      <div id="vor_5" class="voronoi-set"></div>
+      <div id="vor_6" class="voronoi-set"></div>
+      <p>These are both perfectly good 3-part partitions of a 4-element set, with the first element in its own set.</p>
+      <p>Now, if the first is not alone, then it must be in a group with some other elements of the set. There are n-1 elements left,
+      and they can form k subsets in S(n-1, k) different ways. Now, for each of these different partitioning schemes,
+          we can insert the first element into each of the k subsets. We know there are S(n-1, k) such valid partitions,
+          and multiplying by the k choices for inserting the first element, there are kS(n-1, k) total possibilities.</p>
 
-    var force = d3.layout.force()
-            .on("tick", tick)
-            .charge(function(d) { return d._children ? -d.size / 100 : -30; })
-            .linkDistance(function(d) { return d.target._children ? 80 : 30; })
-            .size([w, h - 160]);
+      <p>To illustrate again with n=4, k=3: ignoring the first element, you can partition the remaining 3 elements in just one way.</p>
+      <div id="vor_7" class="voronoi-set"></div>
+      <p>Now there are k=3 ways to add it to another set: one for each subset we just found.</p>
+      <div id="vor_8" class="voronoi-set"></div>
+      <div id="vor_9" class="voronoi-set"></div>
+      <div id="vor_10" class="voronoi-set"></div>
 
-    var vis = d3.select("body").append("svg:svg")
-            .attr("width", w)
-            .attr("height", h);
+      <p>This is exactly what is expected: there are S(3,3)=1 ways to partition the remaining 3 elements, and k=3 ways to
+      include the left-over first element. kS(n,k) = 3S(3,3) = 3, as expected.</p>
 
-    d3.json("flare.json", function(json) {
-        root = stirlingJSON(6, 3);
-        root.fixed = true;
-        root.x = w / 2;
-        root.y = h / 2 - 80;
-        update();
-    });
 
-    function update() {
-        var nodes = flatten(root),
-                links = d3.layout.tree().links(nodes);
 
-        // Restart the force layout.
-        force
-                .nodes(nodes)
-                .links(links)
-                .start();
+      <p>Now complete the argument, let's get a little bit meta.
+      You will agree that the first element can either be by itself, or be with other elements.
+      Formally, that means that the set of partitions with this element by itself, and the set of partitions where it is with other elements,
+      partition the set of all possible partitions!</p>
+      <p>This is great, because it means that we can just add up the number for each and get the total size of the set.
+      We said that there were S(n-1, k-1) partitions where the first element was alone, and kS(n-1, k) where it was with others.
+      Now by adding, we find that S(n,k)=S(n-1, k-1) + S(n-1, k).</p>
 
-        // Update the links…
-        link = vis.selectAll("line.link")
-                .data(links, function(d) { return d.target.id; });
+      <p>Naturally, such a recurrence relation lends itself to a tree-like structure. Here are a few examples that should
+      make Stirling numbers a bit easier to visualize. Click on the nodes to compress them and mouse over to see
+      what stirling number it represents.</p>
 
-        // Enter any new links.
-        link.enter().insert("svg:line", ".node")
-                .attr("class", "link")
-                .attr("x1", function(d) { return d.source.x; })
-                .attr("y1", function(d) { return d.source.y; })
-                .attr("x2", function(d) { return d.target.x; })
-                .attr("y2", function(d) { return d.target.y; });
 
-        // Exit any old links.
-        link.exit().remove();
+      <div id="stirling_vis_1" style="background-color:#f08080;" class="stirling-vis"></div>
+      <div id="stirling_vis_2" style="background-color:#483d8b;" class="stirling-vis"></div>
 
-        // Update the nodes…
-        node = vis.selectAll("circle.node")
-                .data(nodes, function(d) { return d.id; })
-                .style("fill", color);
+      <script type="text/javascript">
+          var width = 500, height=300;
 
-        node.transition()
-                .attr("r", function(d) { return d.children ? 4.5 : Math.sqrt(d.size) / 10; });
+          createStirlingVis('stirling_vis_1', 400, 400, 5, 2);
+          createStirlingVis('stirling_vis_2', 960, 800, 6, 3);
+          createVoronoi(width, height, 'vor_1', ['red']);
+          createVoronoi(width, height, 'vor_2', ['green', 'yellow', 'blue']);
+          createVoronoi(width, height, 'vor_3', ['red']);
+          createConstant4Voronoi(width, height, 'vor_4', ['green', 'yellow', 'blue', 'red'])
+          createConstant4Voronoi(width, height, 'vor_5', ['yellow', 'green', 'blue', 'blue'])
+          createConstant4Voronoi(width, height, 'vor_6', ['yellow', 'blue', 'blue', 'green'])
+          createConstant4Voronoi(width, height, 'vor_7', ['gray', 'red', 'blue','green' ])
+          createConstant4Voronoi(width, height, 'vor_8', ['red', 'red', 'blue','green' ])
+          createConstant4Voronoi(width, height, 'vor_9', ['blue', 'red', 'blue','green' ])
+          createConstant4Voronoi(width, height, 'vor_10', ['green', 'red', 'blue','green' ])
 
-        // Enter any new nodes.
-        node.enter().append("svg:circle")
-                .attr("class", "node")
-                .attr("cx", function(d) { return d.x; })
-                .attr("cy", function(d) { return d.y; })
-                .attr("r", function(d) { return d.children ? 4.5 : Math.sqrt(d.size) / 10; })
-                .style("fill", color)
-                .on("click", click)
-                .call(force.drag);
 
-        // Exit any old nodes.
-        node.exit().remove();
-    }
 
-    function tick() {
-        link.attr("x1", function(d) { return d.source.x; })
-                .attr("y1", function(d) { return d.source.y; })
-                .attr("x2", function(d) { return d.target.x; })
-                .attr("y2", function(d) { return d.target.y; });
 
-        node.attr("cx", function(d) { return d.x; })
-                .attr("cy", function(d) { return d.y; });
-    }
 
-    // Color leaf nodes orange, and packages white or blue.
-    function color(d) {
-        return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
-    }
+      </script>
 
-    // Toggle children on click.
-    function click(d) {
-        if (d.children) {
-            d._children = d.children;
-            d.children = null;
-        } else {
-            d.children = d._children;
-            d._children = null;
-        }
-        update();
-    }
-
-    // Returns a list of all nodes under the root.
-    function flatten(root) {
-        var nodes = [], i = 0;
-
-        function recurse(node) {
-            if (node.children) node.size = node.children.reduce(function(p, v) { return p + recurse(v); }, 0);
-            if (!node.id) node.id = ++i;
-            nodes.push(node);
-            return node.size;
-        }
-
-        root.size = recurse(root);
-        return nodes;
-    }
-
-</script>
-</body>
+   </div>
+  </body>
 </html>

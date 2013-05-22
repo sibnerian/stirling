@@ -1,88 +1,55 @@
-body {
+/* I will put more stuff here one day, I really will! */
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
 
-
-a:link, a:visited {
-  color: #777;
-  text-decoration: none;
+circle.node {
+    cursor: pointer;
+    stroke: #000;
+    stroke-width: .5px;
 }
 
-a:hover {
-  color: #666;
+path {
+    stroke:#000;
 }
 
-blockquote {
-  margin: 0;
+body{
+    font-size: 1.5rem;
+    font-family: 'Open Sans', sans-serif;
+}
+line.link {
+    fill: none;
+    stroke: #9ecae1;
+    stroke-width: 1.5px;
 }
 
-blockquote:before {
-  content: "â€œ";
-  position: absolute;
-  left: -.4em;
-}
-
-blockquote:after {
-  content: "â€";
-  position: absolute;
-}
-
-body > ul {
-  margin: 0;
-  padding: 0;
+.container {
+    width:960px;
+    margin:auto;
 }
 
 h1 {
-  font-size: 64px;
+    text-align: center;
+    margin-bottom: 30px;
 }
 
-h1, h2, h3 {
-  font-weight: inherit;
-  margin: 0;
+.voronoi-set {
+    width:500px;
+    height:300px;
+    margin-left:230px;
+    margin-bottom:10px;
+    border: 2px solid black;
+
 }
 
-h2, h3 {
-  text-align: right;
-  font-size: inherit;
-  position: absolute;
-  bottom: 0;
-  right: 0;
+.stirling-vis {
+    margin-top:20px;
 }
 
-h2 {
-  font-size: 24px;
-  position: absolute;
+#stirling_vis_2 {
+    width:960px;
+    height: 800px;;
 }
-
-h3 {
-  bottom: -20px;
-  font-size: 18px;
-}
-
-.invert {
-  background: #1f1f1f;
-  color: #dcdccc;
-}
-
-.invert h2, .invert h3 {
-  color: #7f9f7f;
-}
-
-.string, .regexp {
-  color: #f39;
-}
-
-.keyword {
-  color: #00c;
-}
-
-.comment {
-  color: #777;
-  font-style: oblique;
-}
-
-.number {
-  color: #369;
-}
-
-.class, .special {
-  color: #1181B8;
+#stirling_vis_1{
+    width:400px;
+    height:400px;
+    margin-left:280px;
 }
