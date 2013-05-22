@@ -1,0 +1,1 @@
+This is a visual lesson on Stirling numbers I made to learn D3. 
